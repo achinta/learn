@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import SearchBar from '../components/SearchBar';
 import zomato from '../api/zomato';
 import useRestaurants from '../hooks/useRestaurants';
@@ -12,15 +12,13 @@ const SearchScreen = () => {
 
     const filterResultsByPriceRange = (price_range) => {
         const filtered = results.filter( result => {
-            // console.log(result);
             return result['restaurant']['price_range'] === price_range;
         });
-        // console.log('type of price_range ' + typeof(results[0]['price_range']));
-        console.log('results for price_range - ', price_range, filtered.length);
         return filtered;
     }; 
 
-    return <View>
+    return <View style={{flex: 1}}>
+        {/* use flex 1 if we have content being cut off, as it is expanding beyond the screen */}
         <SearchBar term={term} 
         onTermChange={newTerm => setTerm(newTerm)}
         onTermSubmit={() => searchApi(term)}
@@ -29,9 +27,13 @@ const SearchScreen = () => {
         {errorMessage ? <Text>{errorMessage}</Text> : null}
         <Text>We have found {results.length}</Text>
         <Text>{term}</Text>
-        <ResultList results={filterResultsByPriceRange(1)} title="Cost Effective"/>
-        <ResultList results={filterResultsByPriceRange(2)} title="Bit Pricier"/>
-        <ResultList results={filterResultsByPriceRange(3)} title="Big Spender"/>
+
+        {/* scrollview makes vertical scrolling for a list */}
+        <ScrollView>
+            <ResultList results={filterResultsByPriceRange(1)} title="Cost Effective"/>
+            <ResultList results={filterResultsByPriceRange(2)} title="Bit Pricier"/>
+            <ResultList results={filterResultsByPriceRange(3)} title="Big Spender"/>
+        </ScrollView>
     </View>
 };
 
