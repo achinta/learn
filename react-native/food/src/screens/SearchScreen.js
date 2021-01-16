@@ -6,7 +6,7 @@ import useRestaurants from '../hooks/useRestaurants';
 import ResultList from '../components/ResultsList';
 
 
-const SearchScreen = () => {
+const SearchScreen = ({ }) => {
     const [term, setTerm] = useState('');
     const [searchApi, results, errorMessage] = useRestaurants();
 
@@ -30,9 +30,9 @@ const SearchScreen = () => {
 
         {/* scrollview makes vertical scrolling for a list */}
         <ScrollView>
-            <ResultList results={filterResultsByPriceRange(1)} title="Cost Effective"/>
-            <ResultList results={filterResultsByPriceRange(2)} title="Bit Pricier"/>
-            <ResultList results={filterResultsByPriceRange(3)} title="Big Spender"/>
+            <ResultList results={filterResultsByPriceRange(1)} title="Cost Effective" />
+            <ResultList results={filterResultsByPriceRange(2)} title="Bit Pricier" />
+            <ResultList results={filterResultsByPriceRange(3)} title="Big Spender" />
         </ScrollView>
     </View>
 };

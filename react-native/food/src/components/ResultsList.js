@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import ResultsDetail from '../components/ResultsDetail';
+import { withNavigation } from 'react-navigation';
 
-const ResultsList = ({title, results}) => {
+// get the 'navigation' directly, instead of being passed from search screen
+const ResultsList = ({title, results, navigation}) => {
     return <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
         <Text>Results: {results.length}</Text>
@@ -11,8 +13,15 @@ const ResultsList = ({title, results}) => {
             showsHorizontalScrollIndicator={false}
             data={results}
             keyExtractor={(result) => result.restaurant.id}
+            // renderItem={({item}) => {
+            //     return <ResultsDetail result={item.restaurant}/>;
+            // }}
             renderItem={({item}) => {
-                return <ResultsDetail result={item.restaurant}/>;
+                return (
+                    <TouchableOpacity onPress={() => navigation.navigate('ResultsShow')}>
+                        <ResultsDetail result={item.restaurant}/>
+                    </TouchableOpacity>
+                )
             }}
         />
     </View>
@@ -29,4 +38,4 @@ const styles = StyleSheet.create({
         marginBottom: 10
     }
 })
-export default ResultsList;
+export default withNavigation(ResultsList);
