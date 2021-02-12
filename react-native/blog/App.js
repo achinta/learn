@@ -22,7 +22,8 @@ const navigator = createStackNavigator({
 
 const App = createAppContainer(navigator);
 
-// we are exporting StackNavigator wrapped around in the BlogProvider
+// we are exporting StackNavigator wrapped around in the BlogProvider, 
+// making it available in the entire app
 export default () => {
   return <Provider>
       <App />

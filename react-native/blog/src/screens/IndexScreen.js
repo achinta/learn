@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Text, StyleSheet, View, FlatList, Button, TouchableOpacity} from 'react-native';
 import { Context } from '../context/BlogContext';
 import { Feather } from '@expo/vector-icons';
@@ -6,7 +6,23 @@ import { Feather } from '@expo/vector-icons';
 
 
 const IndexScreen = ({ navigation }) => {
-    const { state, addBlogPost, deleteBlogPost } = useContext(Context);
+    const { state, addBlogPost, deleteBlogPost, getBlogPosts } = useContext(Context);
+
+    useEffect(() => {
+        getBlogPosts();
+
+        // whenever this screen gets focus, refresh the data
+        const listener = navigation.addListener('didFocus', ()=> {
+            getBlogPosts();
+        });
+
+        // remove listener when index screen is destroyed
+        return () => {
+            listener.remove();
+        };
+
+    }, []);
+
     return <View>
         <FlatList  
         data={state} 

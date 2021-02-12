@@ -1,15 +1,17 @@
 import React, { useReducer } from 'react';
 import { call } from 'react-native-reanimated';
+import jsonServer from '../api/jsonServer';
 import createDataContext from './createDataContext'
 
 
 const blogReducer = (state, action) => {
     switch(action.type){
-        case 'add_blogpost':
-            return [...state, { id: Math.floor(Math.random() * 9999),
-                title: action.payload.title, 
-                content: action.payload.content
-            }]
+        // this is not needed as index screen will automatically do a fetch again
+        // case 'add_blogpost':
+        //     return [...state, { id: Math.floor(Math.random() * 9999),
+        //         title: action.payload.title, 
+        //         content: action.payload.content
+        //     }]
         case 'edit_blogpost':
             return state.map((blogPost) => {
                 return blogPost.id === action.payload.id 
@@ -18,14 +20,25 @@ const blogReducer = (state, action) => {
             });
         case 'delete_blogpost':
             return state.filter((blogPost) => blogPost.id !== action.payload);
+        case 'get_blogposts':
+            return action.payload;
         default: 
             return state;
     }
 }; 
 
+const getBlogPosts = (dispatch) => {
+    return async() => {
+        const response = await jsonServer.get('/blogPosts');
+
+        dispatch({ type: 'get_blogposts', payload: response.data }); 
+    };
+}
+
 const addBlogPost = (dispatch) => {
-    return (title, content, callback) => {
-        dispatch({type: 'add_blogpost', payload: {title, content}});
+    return async (title, content, callback) => {
+         await jsonServer.post('/blogPosts', {title, content});
+        // dispatch({type: 'add_blogpost', payload: {title, content}});
         if (callback){
             callback(); 
         }
@@ -33,7 +46,11 @@ const addBlogPost = (dispatch) => {
 };
 
 const editBlogPost = (dispatch) => {
-    return (id, title, content, callback) => {
+    return async (id, title, content, callback) => {
+        // remote state
+        jsonServer.put(`/blogposts/${id}`, {title, content});
+
+        // local state
         dispatch({ type: 'edit_blogpost',payload: { id, title, content }});
         if (callback){
             callback();
@@ -42,13 +59,14 @@ const editBlogPost = (dispatch) => {
 }
 
 const deleteBlogPost = (dispatch) => {
-    return (id) => {
+    return async (id) => {
+        await jsonServer.delete(`/blogposts/${id}`);
         dispatch({ type: 'delete_blogpost', payload: id})
     }
 }
 
 export const { Context, Provider } = createDataContext(
     blogReducer, 
-    { addBlogPost, deleteBlogPost, editBlogPost},
-    [{ title: 'Test Post', content: 'Test Content', id: 1}]
+    { addBlogPost, deleteBlogPost, editBlogPost, getBlogPosts},
+    [ ]
     ); 
