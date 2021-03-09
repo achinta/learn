@@ -27,6 +27,11 @@ const HomeScreen = ({navigation}) => {
     onPress={() => {
       navigation.navigate("Image")
     }} />
+    
+    <Button title="Go to Box Screen"
+    onPress={() => {
+      navigation.navigate("Box")
+    }} />
   </View>;
 };
 
