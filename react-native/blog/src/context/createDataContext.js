@@ -4,9 +4,13 @@ export default (reducer, actions, initialState) => {
     const Context = React.createContext();
 
     const Provider = ({ children }) => {
+        // dispath(params) is a wrapper which invokes reducer(state, params)
         const [state, dispatch] = useReducer(reducer, initialState);
 
-        // actions === { addBlogPost: (dispatch) => {return () => {}}}
+        // We extend the actions {addBlog: addBlog} with {addBlog:addBlog(dispatch)} in the provider
+        // addBlog returns a addblog_wrapper(title), which has access to disptach. See BlogContext.js
+        // When it is called from a screen with addBlog(title='xyz), addblog_wrapper does something (lets say with api)
+        // and then uses disptach to invoke the reducer. 
         const boundActions = {};
         for (let key in actions){
             //call action with dispatch
