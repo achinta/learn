@@ -14,3 +14,6 @@ npm run db
 # expose it to outside world
 npm run tunnel
 ```
+
+### Useful references
+ - [Understanding Data Context](./blog/src/context/createDataContext.js)
