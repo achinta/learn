@@ -10,3 +10,6 @@ We can create various sized icons in https://appicon.co/. From the generated fil
 
 #### Flutter Layout cheatsheet
 https://medium.com/flutter-community/flutter-layout-cheat-sheet-5363348d037e
+
+#### Fonts
+https://fonts.google.com/
