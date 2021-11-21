@@ -13,3 +13,6 @@ https://medium.com/flutter-community/flutter-layout-cheat-sheet-5363348d037e
 
 #### Fonts
 https://fonts.google.com/
+
+#### Icons
+https://www.materialpalette.com/
