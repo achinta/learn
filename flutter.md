@@ -16,3 +16,6 @@ https://fonts.google.com/
 
 #### Icons
 https://www.materialpalette.com/
+
+#### Free sounds
+https://freesound.org/
