@@ -19,3 +19,7 @@ https://www.materialpalette.com/
 
 #### Free sounds
 https://freesound.org/
+
+#### Good designs
+https://dribbble.com/
+
