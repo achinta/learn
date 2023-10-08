@@ -1,7 +1,10 @@
 ### Creating App Icons
-We can create various sized icons in https://appicon.co/. From the generated files, 
-  - `android` folder contents (mipmap* files) should be moved to project/app/src/main/res/ after deleting the existing mipmap* folders. 
-  - For ios, the folder to be replaced is ios/Runner/Assets.xcassets
+We can create various sized icons in https://appicon.co/ and downoad them. 
+  - delete `mipmap*` folders from `android/app/src/main/res` of the project and copy the `android\mipmap*` from the downloaded files.
+  - For ios, replace the ios/Runner/Assets.xcassets with the downloaded Assets.xcassets folder
+
+### Course Resources
+https://github.com/londonappbrewery/Flutter-Course-Resources/
 
 #### Assets
 - https://icons8.com/
