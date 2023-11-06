@@ -49,8 +49,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String currentImagePath = 'assets/Cars1.png';
-  int currentCarNumber = 0;
+  String currentImagePath = '';
+  int _currentCarNumber = 0;
+  int get currentCarNumber => _currentCarNumber;
+  set currentCarNumber(int value) {
+    _currentCarNumber = value;
+    detectObjects(value).then((_) => setState(() {}));
+  }
   // create a list of car numbers from 1 to 100
   List<int> carNumbers = List<int>.generate(100, (i) => i + 1);
   InputImage? inputImage;
@@ -58,7 +63,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // list of bounding boxes
   List<Rect> boundingBoxes = [];
 
-  _MyHomePageState() {}
+  _MyHomePageState() {
+    currentCarNumber = 0;
+  }
 
   //  store bounding box
   Rect boundingBox = const Rect.fromLTWH(0, 0, 0, 0);
@@ -74,7 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return file;
   }
 
-  void detectObjects() async {
+  Future<void> detectObjects(carNumber) async {
+    currentImagePath = getCarImagePath(carNumber);
+    inputImage = await getInputImageFromFile(currentImagePath);
+    currentImage = Image.asset(currentImagePath);
+
     //  create detector
     const mode = DetectionMode.single;
     final options = ObjectDetectorOptions(
@@ -122,9 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    currentImagePath = getCarImagePath(currentCarNumber);
-    getInputImageFromFile(currentImagePath).then((img) => {inputImage = img});
-    currentImage = Image.asset(currentImagePath);
+    // currentImagePath = getCarImagePath(currentCarNumber);
+    // getInputImageFromFile(currentImagePath).then((img) => {inputImage = img});
+    // currentImage = Image.asset(currentImagePath);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -138,24 +149,21 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             //disable button if currentCarNumber is 1
             ElevatedButton(
-                onPressed: currentCarNumber == 1
-                    ? null
-                    : () {
-                        setState(() {
-                          currentCarNumber--;
-                          detectObjects();
-                        });
-                      },
+                onPressed: () async {
+                  currentCarNumber--;
+                  // await detectObjects();
+                  // setState(() {});
+                },
                 child: const Text('Previous')),
-            //disable button if currentCarNumber is 100
+            //disable button if currentCarNumber is last
             ElevatedButton(
                 onPressed: currentCarNumber == 413
                     ? null
-                    : () {
-                        setState(() {
-                          currentCarNumber++;
-                          detectObjects();
-                        });
+                    : () async {
+                        currentCarNumber++;
+                        // await detectObjects();
+                        // setState(() {
+                        // });
                       },
                 child: const Text('Next')),
           ],
