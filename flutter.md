@@ -30,3 +30,6 @@ https://dribbble.com/
 https://docs.flutter.dev/cookbook
 Themes - https://docs.flutter.dev/cookbook/design/themes
 
+#### Colors
+Get color from a web page - Colorzilla plugin: https://chrome.google.com/webstore/detail/colorzilla/bhlhnicpbhignbdhedgjhgdocnmhomnp
+

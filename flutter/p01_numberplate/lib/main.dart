@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 // import 'package:camera/camera.dart';
@@ -5,7 +6,10 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:path_provider/path_provider.dart';
-import 'utils/paint.dart';
+import 'painters/paint.dart';
+import 'painters/object_detector_painter.dart';
+import 'object_detector_view.dart';
+import 'detector_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,11 +29,10 @@ class MyApp extends StatelessWidget {
       ),
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       home: Scaffold(
-        appBar: AppBar(
-            // title: const Text('Flutter Demo Home Page'),
-            ),
+        appBar: AppBar(),
         body: const Center(
           child: MyHomePage(title: 'hello'),
+          // child: ImageTest(),
         ),
       ),
     );
@@ -46,7 +49,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String currentImagePath = 'assets/Cars0.png';
+  String currentImagePath = 'assets/Cars1.png';
+  int currentCarNumber = 0;
+  // create a list of car numbers from 1 to 100
+  List<int> carNumbers = List<int>.generate(100, (i) => i + 1);
+  InputImage? inputImage;
+  Image? currentImage;
+  // list of bounding boxes
+  List<Rect> boundingBoxes = [];
+
+  _MyHomePageState() {}
+
+  //  store bounding box
+  Rect boundingBox = const Rect.fromLTWH(0, 0, 0, 0);
 
   Future<File> getImageFileFromAssets(String path) async {
     final byteData = await rootBundle.load(path);
@@ -59,51 +74,105 @@ class _MyHomePageState extends State<MyHomePage> {
     return file;
   }
 
-  void detectObjects(String filePath) async {
+  void detectObjects() async {
     //  create detector
     const mode = DetectionMode.single;
     final options = ObjectDetectorOptions(
         mode: mode, classifyObjects: true, multipleObjects: true);
     final detector = ObjectDetector(options: options);
 
-    // create input image
-    File imageFile = await getImageFileFromAssets(filePath);
-    final inputImage = InputImage.fromFile(imageFile);
-
-    // detect objects
+    // get input image and detect objects
     final List<DetectedObject> objects =
-        await detector.processImage(inputImage);
+        await detector.processImage(inputImage!);
+
+    // if (inputImage.metadata?.size != null &&
+    //     inputImage.metadata?.rotation != null) {
+    //   final painter = ObjectDetectorPainter(
+    //     objects,
+    //     inputImage.metadata!.size,
+    //     inputImage.metadata!.rotation,
+    //     CameraLensDirection.back,
+    //   );
 
     //print number of objects detected
     print(objects.length);
+    boundingBoxes = [];
     for (DetectedObject detectedObject in objects) {
-      final rect = detectedObject.boundingBox;
+      // boundingBox = bb;
       final trackingId = detectedObject.trackingId;
+      // print(detectedObject.boundingBox);
+      boundingBoxes.add(detectedObject.boundingBox);
 
-      for (Label label in detectedObject.labels) {
-        print('$label.text, $label.confidence, $rect, $trackingId');
-      }
+      // for (Label label in detectedObject.labels) {
+      //   print('$label.text, $label.confidence, $boundingBox, $trackingId');
+      // }
     }
+  }
+
+  String getCarImagePath(int carNumber) {
+    return 'assets/Cars$carNumber.png';
+  }
+
+  Future<InputImage> getInputImageFromFile(String filePath) async {
+    // final inputImage = InputImage.fromFile(filePath);
+    File imageFile = await getImageFileFromAssets(filePath);
+    final inputImage = InputImage.fromFile(imageFile);
+    return inputImage;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(
+    currentImagePath = getCarImagePath(currentCarNumber);
+    getInputImageFromFile(currentImagePath).then((img) => {inputImage = img});
+    currentImage = Image.asset(currentImagePath);
+
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      // crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Image.asset(currentImagePath),
-        ElevatedButton(
-            onPressed: () {
-              detectObjects(currentImagePath);
-            },
-            child: const Text('Detect')),
-        BoundingBoxImage(
-          imageProvider: Image.asset(currentImagePath).image,
-          boundingBox: const Rect.fromLTWH(0, 0, 100, 100),
+        // Image.asset(currentImagePath),
+        currentImage ?? const Text('no image'),
+        //create two buttons in a row, 'left' and 'right', which will change the image
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            //disable button if currentCarNumber is 1
+            ElevatedButton(
+                onPressed: currentCarNumber == 1
+                    ? null
+                    : () {
+                        setState(() {
+                          currentCarNumber--;
+                          detectObjects();
+                        });
+                      },
+                child: const Text('Previous')),
+            //disable button if currentCarNumber is 100
+            ElevatedButton(
+                onPressed: currentCarNumber == 413
+                    ? null
+                    : () {
+                        setState(() {
+                          currentCarNumber++;
+                          detectObjects();
+                        });
+                      },
+                child: const Text('Next')),
+          ],
+        ),
+
+        Visibility(
+          visible: inputImage != null,
+          child: BoundingBoxImage(
+            image: Image.asset(currentImagePath),
+            boundingBoxes: boundingBoxes,
+            imageSize: (inputImage?.metadata?.size) ?? const Size(0, 0),
+            rotation: (inputImage?.metadata?.rotation) ??
+                InputImageRotation.rotation0deg,
+            cameraLensDirection: CameraLensDirection.back,
+          ),
         ),
       ],
-    ));
+    );
   }
 }
