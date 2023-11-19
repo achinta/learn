@@ -5,3 +5,5 @@ node_modules/
 __MACOSX
 *.zip
 *.pdf
+flutter/ajclima/
+flutter/f07_quizzler/

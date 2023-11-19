@@ -50,11 +50,20 @@ class BoundingBoxPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5.0;
 
-    print('painting bounding boxes $boundingBoxes');
+    final borderPaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5.0;
+
+    print('painting bounding boxes $boundingBoxes. size is $size');
     for (Rect boundingBox in boundingBoxes) {
       canvas.drawRect(boundingBox, paint);
     }
     // canvas.drawRect(boundingBox, paint);
+
+    // draw border
+    // print('drawing border ${Rect.fromLTWH(0, 0, size.width, size.height)}');
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), borderPaint);
 
     // Rect bb = getRectFromBoundingBox(boundingBox, size);
     // canvas.drawRect(
@@ -93,7 +102,7 @@ class RectanglePainter extends CustomPainter {
     }
     // draw border
     print('drawing border ${Rect.fromLTWH(0, 0, size.width, size.height)}');
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), borderPaint);
+    // canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), borderPaint);
   }
 
   @override
@@ -120,11 +129,12 @@ class BoundingBoxImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('In BBImage painter');
+    // print('In BBImage painter');
     return CustomPaint(
       painter: BoundingBoxPainter(
           boundingBoxes, imageSize, rotation, cameraLensDirection),
-      // child: image,
+        size: imageSize
+        
     );
   }
 }

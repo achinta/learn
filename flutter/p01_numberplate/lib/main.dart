@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -56,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _currentCarNumber = value;
     detectObjects(value).then((_) => setState(() {}));
   }
-  // create a list of car numbers from 1 to 100
+  // create a list of car numbers from 1 to 100. Sort them randomly
+
   List<int> carNumbers = List<int>.generate(100, (i) => i + 1);
   InputImage? inputImage;
   Image? currentImage;
@@ -85,6 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
     currentImagePath = getCarImagePath(carNumber);
     inputImage = await getInputImageFromFile(currentImagePath);
     currentImage = Image.asset(currentImagePath);
+    //print image size from file
+    print("image size is ${inputImage?.metadata?.size}");
 
     //  create detector
     const mode = DetectionMode.single;
@@ -95,15 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // get input image and detect objects
     final List<DetectedObject> objects =
         await detector.processImage(inputImage!);
-
-    // if (inputImage.metadata?.size != null &&
-    //     inputImage.metadata?.rotation != null) {
-    //   final painter = ObjectDetectorPainter(
-    //     objects,
-    //     inputImage.metadata!.size,
-    //     inputImage.metadata!.rotation,
-    //     CameraLensDirection.back,
-    //   );
 
     //print number of objects detected
     print(objects.length);
@@ -139,47 +135,59 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Image.asset(currentImagePath),
-        currentImage ?? const Text('no image'),
+        
+        SizedBox(
+          // width: 300,
+          // height: 300,
+          child: Stack(
+            children: [
+              currentImage ?? const Text('no image'),
+              Visibility(
+                visible: inputImage != null,
+                child: BoundingBoxImage(
+                  image: Image.asset(currentImagePath),
+                  boundingBoxes: boundingBoxes,
+                  imageSize: (inputImage?.metadata?.size) ?? const Size(0, 0),
+                  rotation: (inputImage?.metadata?.rotation) ??
+                      InputImageRotation.rotation0deg,
+                  cameraLensDirection: CameraLensDirection.back,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // currentImage ?? const Text('no image'),
         //create two buttons in a row, 'left' and 'right', which will change the image
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //disable button if currentCarNumber is 1
             ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
                   currentCarNumber--;
-                  // await detectObjects();
-                  // setState(() {});
                 },
                 child: const Text('Previous')),
             //disable button if currentCarNumber is last
             ElevatedButton(
                 onPressed: currentCarNumber == 413
                     ? null
-                    : () async {
+                    : () {
                         currentCarNumber++;
-                        // await detectObjects();
-                        // setState(() {
-                        // });
                       },
                 child: const Text('Next')),
+            ElevatedButton(
+                onPressed: () {
+                  // set currentCarNumber to a random value in carNumbers
+                  currentCarNumber = carNumbers[Random().nextInt(100)];
+                },
+                child: const Text('Random')),
           ],
         ),
 
-        Visibility(
-          visible: inputImage != null,
-          child: BoundingBoxImage(
-            image: Image.asset(currentImagePath),
-            boundingBoxes: boundingBoxes,
-            imageSize: (inputImage?.metadata?.size) ?? const Size(0, 0),
-            rotation: (inputImage?.metadata?.rotation) ??
-                InputImageRotation.rotation0deg,
-            cameraLensDirection: CameraLensDirection.back,
-          ),
-        ),
+
       ],
     );
   }
